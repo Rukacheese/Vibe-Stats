@@ -35,9 +35,6 @@
   const BASE_NUM = Object.keys(METRICS).filter((k) => !METRICS[k].derived);
   const MEMBER_NUM = BASE_NUM.concat(GEAR_COLS);
   const GUILD_NUM = ["guild_level", "members", "guild_power", "activeness", "floor", "boss_hp_remaining_pct", "rank", "ranked_floor", "boss_damage_pct"];
-  const MEMBER_HEADER = ["date", "member", "player_id", "role", "power", "level", "contribution", "contribution_total", "class", "class_level", "atk", "def", "hp", "spd"].concat(GEAR_COLS);
-  const GUILD_HEADER = ["date", "guild", "guild_level", "members", "guild_power", "activeness", "floor", "boss_hp_remaining_pct", "relation", "rank", "ranked_guild", "ranked_floor", "boss_damage_pct"];
-  const STATS_HEADER = ["date", "member", "role", "power", "level", "contribution", "event_score"];
   const RADAR = ["power", "level", "contribution", "atk", "def", "hp", "spd", "equip"];
 
   const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"];
@@ -209,7 +206,7 @@
   /* ---------- optional stats file ---------- */
   // The stats file repeats the basic columns (power, level, contribution) and may carry the
   // event columns. It never overrides the members file: it only fills blank event cells, and
-  // every disagreement is listed on the Data page.
+  // every disagreement is kept in S.statsNotes.
   const normName = (n) => n.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
   const STATS_FILL = ["event_score"];
   const STATS_COMPARE = ["power", "level", "contribution"];
@@ -746,90 +743,8 @@
     return out.sort((a, b) => b.date.localeCompare(a.date));
   }
 
-  function viewData(root) {
-    const msg = h("div", { id: "dataMsg" });
-    const file = h("input", { type: "file", accept: ".csv,text/csv", hidden: true, onchange: (e) => e.target.files[0] && readFile(e.target.files[0]) });
-    const drop = h("div", { class: "drop" },
-      h("p", { style: "margin:0 0 10px" }, "Drop a members, stats or guild CSV here to preview it on this device."),
-      h("button", { class: "btn primary", type: "button", onclick: () => file.click() }, "Choose a CSV file"), file);
-    ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
-    ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
-    drop.addEventListener("drop", (e) => e.dataTransfer.files[0] && readFile(e.dataTransfer.files[0]));
-
-    function readFile(f) {
-      const rd = new FileReader();
-      rd.onload = () => {
-        const text = String(rd.result);
-        const head = (text.split(/\r?\n/)[0] || "").toLowerCase();
-        const isGuild = head.includes("relation") && head.includes("ranked_guild");
-        const isMembers = !isGuild && (head.includes("player_id") || head.includes("class") || head.includes("atk"));
-        const kind = isGuild ? "guild" : isMembers ? "members" : "stats";
-        const res = isGuild ? toGuild(text) : toMembers(text);
-        if (res.error) { msg.replaceChildren(h("p", { class: "msg err" }, f.name + ": " + res.error)); return; }
-        const src = "Local file: " + f.name;
-        if (kind === "guild") setGuild(res.rows, src); else if (kind === "members") loadMembers(res.rows, src); else loadStats(res.rows, src);
-        render();
-        document.getElementById("dataMsg").replaceChildren(h("p", { class: "msg ok" }, "Loaded " + res.rows.length + " rows from " + f.name + " as the " + kind + " file. This is a preview only; nothing is saved or published."));
-      };
-      rd.readAsText(f);
-    }
-    const download = (name, header, example) => {
-      const a = h("a", { href: URL.createObjectURL(new Blob([header.join(",") + "\n" + example + "\n"], { type: "text/csv" })), download: name });
-      document.body.append(a); a.click(); a.remove();
-    };
-    const memberExample = "2026-10-12,ExampleName,700000000000,Member,15000000,160,500,10000,Magister,200,900000,800000,4000000,700000,150,150,150,150,150,150,150,150,150,150,150,150,150";
-    const guildExample = "2026-10-12,YourGuild,18,59,900000000,870000,115,50.0,self,2,YourGuild,115,50.0";
-    const statsExample = "2026-10-12,ExampleName,Member,15000000,160,500,84000";
-
-    const issues = allIssues().concat(S.statsNotes).sort((a, b) => b.date.localeCompare(a.date));
-    const checkBlock = issues.length
-      ? h("div", { class: "table-wrap", style: "margin-bottom:24px;max-height:380px;overflow:auto" }, h("table", {},
-        h("thead", {}, h("tr", {}, h("th", { scope: "col" }, "Week"), h("th", { scope: "col" }, "Where"), h("th", { scope: "col" }, "What looks wrong"))),
-        h("tbody", {}, issues.slice(0, 80).map((i) => h("tr", {}, h("td", {}, dateLabel(i.date)), h("td", { class: "name" }, i.where), h("td", { style: "white-space:normal;min-width:260px" }, i.text))))))
-      : h("p", { class: "msg ok" }, "No problems spotted.");
-
-    const latest = S.dates[S.dates.length - 1];
-    root.append(
-      h("h1", {}, "Data"),
-      h("p", { class: "lede" }, "The site reads up to three CSV files: member details (one row per member per week), the guild ranking (one block of rows per week), and an optional stats file for event scores."),
-      msg,
-      h("div", { class: "strip" }, h("dl", {},
-        h("div", {}, h("dt", {}, "Members file"), h("dd", { style: "font-size:16px;word-break:break-all" }, S.memberSource)),
-        h("div", {}, h("dt", {}, "Member rows"), h("dd", {}, fullFmt.format(S.rows.length), h("small", {}, S.dates.length + (S.dates.length === 1 ? " week: " : " weeks: ") + (S.dates.length > 1 ? dateLabel(S.dates[0]) + " to " + dateLabel(latest) : dateLong(latest))))),
-        h("div", {}, h("dt", {}, "Guild file"), h("dd", { style: "font-size:16px;word-break:break-all" }, S.guildSource || (S.guildError ? "Could not be read" : "Not found"))),
-        h("div", {}, h("dt", {}, "Guild rows"), h("dd", {}, String(S.guild.length))),
-        h("div", {}, h("dt", {}, "Stats file"), h("dd", { style: "font-size:16px;word-break:break-all" }, S.statsSource || (S.statsError ? "Could not be read" : "Not found"),
-          S.statsSource ? h("small", {}, S.metrics.includes("event_score") ? "Event scores loaded" : "No event scores in it yet") : null)))),
-      S.guildError ? h("p", { class: "msg err" }, S.guildError) : document.createDocumentFragment(),
-      S.statsError ? h("p", { class: "msg err" }, S.statsError) : document.createDocumentFragment(),
-      h("h2", {}, "Worth checking"),
-      h("p", { class: "lede", style: "margin-bottom:12px" }, "Values that look like typing or reading slips. The site still shows them as they are, so correct the CSV and publish again."),
-      checkBlock,
-      h("div", { class: "grid" },
-        h("section", { class: "card" }, h("h2", {}, "Update the site"),
-          h("ol", { class: "steps" },
-            h("li", {}, "Add the new week’s rows at the end of data/members.csv and data/guild.csv. If you track events, add them to data/stats.csv too."),
-            h("li", {}, "Keep the first line (the column names) and write dates as YYYY-MM-DD."),
-            h("li", {}, "On GitHub, open the file, choose the pencil, paste the rows, then Commit changes."),
-            h("li", {}, "GitHub Pages republishes in about a minute.")),
-          h("div", { class: "controls" },
-            h("button", { class: "btn", type: "button", onclick: () => download("members-template.csv", MEMBER_HEADER, memberExample) }, "Members template"),
-            h("button", { class: "btn", type: "button", onclick: () => download("guild-template.csv", GUILD_HEADER, guildExample) }, "Guild template"),
-            h("button", { class: "btn", type: "button", onclick: () => download("stats-template.csv", STATS_HEADER, statsExample) }, "Stats template"))),
-        h("section", { class: "card" }, h("h2", {}, "Preview a file"), h("p", { class: "lede", style: "margin-bottom:12px" }, "Check a file before you publish it. Errors tell you which line to fix."), drop)),
-      h("h2", { style: "margin-top:28px" }, "Latest member rows"),
-      h("div", { class: "table-wrap", style: "max-height:420px;overflow:auto" }, (() => {
-        const cols = ["date", "member", "role", "class", "power", "level", "contribution", "atk", "def", "hp", "spd"].filter((c) => c === "date" || c === "member" || c === "role" || c === "class" || S.metrics.includes(c));
-        const text = new Set(["date", "member", "role", "class"]);
-        const recent = S.rows.slice().sort((a, b) => b.date.localeCompare(a.date) || a.member.localeCompare(b.member)).slice(0, 200);
-        return h("table", {},
-          h("thead", {}, h("tr", {}, cols.map((c) => h("th", { scope: "col", class: text.has(c) ? "" : "num" }, c)))),
-          h("tbody", {}, recent.map((r) => h("tr", {}, cols.map((c) => h("td", { class: text.has(c) ? "" : "num" }, text.has(c) ? r[c] : r[c] == null ? "—" : fullFmt.format(r[c])))))));
-      })()));
-  }
-
   /* ---------- router ---------- */
-  const ROUTES = { rankings: viewRankings, charts: viewCharts, compare: viewCompare, member: viewMember, guild: viewGuild, data: viewData };
+  const ROUTES = { rankings: viewRankings, charts: viewCharts, compare: viewCompare, member: viewMember, guild: viewGuild };
   const NAV_FOR = { member: "rankings" };
 
   function parseHash() {

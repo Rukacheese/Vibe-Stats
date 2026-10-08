@@ -9,7 +9,6 @@ A static website (HTML/CSS/JS, no installation required) that displays rankings,
 - **Charts**: member distribution, top 10, members by class, median stats by class, power versus level, and trends over time once two weeks of data are available.
 - **Compare**: two members side by side (table, radar chart showing their standing within the guild, and trends over time).
 - **Guild**: floor reached, boss damage, guild power and activity, and the standings of the guilds immediately above and below ours.
-- **Data**: loaded files, values to check, CSV templates, and file previews before publishing.
 
 ## Data files (`data/` folder)
 
@@ -27,11 +26,6 @@ About `stats.csv`: it never replaces `members.csv`. It adds event scores (the �
 
 When numbers are extracted from screenshots, errors can occur. The website does not correct anything: it displays the values as provided, but flags anything that looks incorrect with a ⚠ (in Rankings, on the member profile, and in the **Data** tab list). These warnings may indicate power that does not match HP, a stat that is 10 times too high or too low, an inconsistent equipment item, a level that has decreased, a name containing an unusual character, or a sum of member power values that differs from the guild’s total power. Correct the CSV and publish again.
 
-## Publish on GitHub Pages
-
-1. Create a GitHub repository (for example, `guild-tracker`) and upload all the contents of this folder.
-2. In the repository, go to **Settings → Pages → Build and deployment**, set the source to **Deploy from a branch**, select the `main` branch, and choose the `/ (root)` folder.
-3. After about a minute, the website will be live at `https://YOUR-USERNAME.github.io/guild-tracker/`.
 
 ## Update each week
 

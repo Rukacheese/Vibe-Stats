@@ -137,3 +137,32 @@ ol.steps li { margin-bottom: 6px; }
 @media (prefers-reduced-motion: no-preference) {
   .seg button, .tabs a, .btn { transition: background-color .12s, color .12s, border-color .12s; }
 }
+
+/* additions: profile, guild, notices */
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); margin-bottom: 8px; }
+table.mini { width: 100%; }
+table.mini th, table.mini td { padding: 6px 4px; }
+table.mini th { position: static; background: transparent; }
+tr.self td { background: var(--surface-2); font-weight: 600; }
+tr.self td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.msg.warn { border-color: var(--s4); }
+.grid > .msg { grid-column: 1 / -1; margin: 0; }
+h2 { margin-top: 4px; }
+.card .controls { margin: 0 0 8px; }
+td.name { font-weight: 500; }
+
+/* warnings */
+:root { --warn: #e3b04b; }
+.flag { color: var(--warn); margin-left: 6px; font-size: 13px; cursor: help; }
+.msg.warn { border-color: var(--warn); }
+.msg.warn strong { color: var(--warn); }
+ul.plain { margin: 6px 0; padding-left: 20px; }
+ul.plain li { margin-bottom: 2px; }
+
+/* summary strip: no empty grey cell when the count is odd */
+.strip { gap: 0; background: var(--surface); }
+.strip dl > div { box-shadow: 0 0 0 .5px var(--line); }
+.strip dd small { word-break: normal; }
+@media (max-width: 640px) {
+  .tabs a { padding: 8px 9px; }
+}

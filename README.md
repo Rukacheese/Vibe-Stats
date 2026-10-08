@@ -19,9 +19,9 @@ Chaque semaine, on **ajoute des lignes à la fin** de chaque fichier (sans touch
 |---|---|---|
 | `members.csv` | une ligne par membre et par semaine : `date, member, player_id, role, power, level, contribution, contribution_total, class, class_level, atk, def, hp, spd, weapon, second_hand, helmet, chestplate, boots, technique_1 à 4, charm_1 à 4` | oui |
 | `guild.csv` | trois lignes par semaine (guilde au-dessus, la nôtre, guilde en dessous) : `date, guild, guild_level, members, guild_power, activeness, floor, boss_hp_remaining_pct, relation, rank, ranked_guild, ranked_floor, boss_damage_pct` | non |
-| `stats.csv` | `date, member, role, power, level, contribution, event_score, event_participation` | non |
+| `stats.csv` | `date, member, role, power, level, contribution, event_score` | non |
 
-À savoir sur `stats.csv` : il ne remplace jamais `members.csv`. Il sert à ajouter les scores d'événements (les statistiques « Event score » et « Event participation » apparaissent dès qu'au moins une valeur est renseignée), et chaque écart avec `members.csv` est listé dans l'onglet **Data**. Les noms sont rapprochés d'un fichier à l'autre même s'ils sont écrits un peu différemment.
+À savoir sur `stats.csv` : il ne remplace jamais `members.csv`. Il sert à ajouter les scores d'événements (la statistique « Event score » apparaît dès qu'au moins une valeur est renseignée ; une colonne `event_participation` éventuellement présente dans le fichier est ignorée), et chaque écart avec `members.csv` est listé dans l'onglet **Data**. Les noms sont rapprochés d'un fichier à l'autre même s'ils sont écrits un peu différemment.
 
 ## Valeurs à vérifier
 

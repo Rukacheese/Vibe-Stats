@@ -18,8 +18,7 @@
     equip: { label: "Equipment (median)", group: "Gear", derived: true },
     tech: { label: "Techniques (median)", group: "Gear", derived: true },
     charm: { label: "Charms (median)", group: "Gear", derived: true },
-    event_score: { label: "Event score", group: "Events" },
-    event_participation: { label: "Event participation", group: "Events", suffix: "%" }
+    event_score: { label: "Event score", group: "Events" }
   };
   const GEAR = {
     equip: ["weapon", "second_hand", "helmet", "chestplate", "boots"],
@@ -38,7 +37,7 @@
   const GUILD_NUM = ["guild_level", "members", "guild_power", "activeness", "floor", "boss_hp_remaining_pct", "rank", "ranked_floor", "boss_damage_pct"];
   const MEMBER_HEADER = ["date", "member", "player_id", "role", "power", "level", "contribution", "contribution_total", "class", "class_level", "atk", "def", "hp", "spd"].concat(GEAR_COLS);
   const GUILD_HEADER = ["date", "guild", "guild_level", "members", "guild_power", "activeness", "floor", "boss_hp_remaining_pct", "relation", "rank", "ranked_guild", "ranked_floor", "boss_damage_pct"];
-  const STATS_HEADER = ["date", "member", "role", "power", "level", "contribution", "event_score", "event_participation"];
+  const STATS_HEADER = ["date", "member", "role", "power", "level", "contribution", "event_score"];
   const RADAR = ["power", "level", "contribution", "atk", "def", "hp", "spd", "equip"];
 
   const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"];
@@ -212,7 +211,7 @@
   // event columns. It never overrides the members file: it only fills blank event cells, and
   // every disagreement is listed on the Data page.
   const normName = (n) => n.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
-  const STATS_FILL = ["event_score", "event_participation"];
+  const STATS_FILL = ["event_score"];
   const STATS_COMPARE = ["power", "level", "contribution"];
 
   function mergeStats(rows, stats) {
@@ -780,7 +779,7 @@
     };
     const memberExample = "2026-10-12,ExampleName,700000000000,Member,15000000,160,500,10000,Magister,200,900000,800000,4000000,700000,150,150,150,150,150,150,150,150,150,150,150,150,150";
     const guildExample = "2026-10-12,YourGuild,18,59,900000000,870000,115,50.0,self,2,YourGuild,115,50.0";
-    const statsExample = "2026-10-12,ExampleName,Member,15000000,160,500,84000,92";
+    const statsExample = "2026-10-12,ExampleName,Member,15000000,160,500,84000";
 
     const issues = allIssues().concat(S.statsNotes).sort((a, b) => b.date.localeCompare(a.date));
     const checkBlock = issues.length

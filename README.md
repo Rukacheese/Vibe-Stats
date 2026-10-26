@@ -27,24 +27,6 @@ About `stats.csv`: it never replaces `members.csv`. It adds event scores (the �
 When numbers are extracted from screenshots, errors can occur. The website does not correct anything: it displays the values as provided, but flags anything that looks incorrect with a ⚠ (in Rankings, on the member profile, and in the **Data** tab list). These warnings may indicate power that does not match HP, a stat that is 10 times too high or too low, an inconsistent equipment item, a level that has decreased, a name containing an unusual character, or a sum of member power values that differs from the guild’s total power. Correct the CSV and publish again.
 
 
-## Update each week
-
-On GitHub, open the relevant file in `data/`, click the pencil icon, paste the new rows at the end, then click **Commit changes**. The website will be republished within about a minute. You can check a file first using **Data → Preview a file**: formatting errors identify the row that needs to be corrected.
-
-## Customize
-
-- `js/config.js`: website title and paths to the three files.
-- `css/style.css`: colors and typography (variables at the top of the file).
-
-## Test locally
-
-Opening `index.html` directly does not work (the browser blocks access to the CSV files). From this folder, run:
-
-```bash
-python3 -m http.server
-```
-
-Then open http://localhost:8000.
 
 ## Technical notes
 
